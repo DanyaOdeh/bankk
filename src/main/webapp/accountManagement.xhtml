@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Account Management</title>
+</h:head>
+<h:body>
+    <div class="form-section">
+        <h3>Create New Account</h3>
+        <h:form id="accountForm">
+            <p:growl id="accountMessages" showDetail="true" autoUpdate="true" />
+            <p:panel>
+                <h:panelGrid columns="2" cellpadding="5">
+                    <h:outputLabel for="accountCustomer" value="Select Customer:"/>
+                    <p:selectOneMenu id="accountCustomer" value="#{accountBean.account.customer.id}"
+                                     converter="jakarta.faces.Long" required="true" style="width: 300px;">
+                        <f:selectItem itemLabel="-- Select Customer --" itemValue="" />
+                        <f:selectItems value="#{accountBean.customers}" var="cust"
+                                       itemLabel="#{cust.name} (ID: #{cust.nationalId})"
+                                       itemValue="#{cust.id}" />
+                    </p:selectOneMenu>
+
+                    <h:outputLabel for="initialBalance" value="Initial Balance:"/>
+                    <p:inputText id="initialBalance" value="#{accountBean.account.balance}"
+                                 placeholder="0.00" required="true" style="width: 300px;">
+                        <f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2"/>
+                    </p:inputText>
+                </h:panelGrid>
+            </p:panel>
+
+            <p:commandButton value="Create Account" icon="pi pi-plus-circle"
+                             action="#{accountBean.createAccount}"
+                             update="accountForm accountsTable"
+                             styleClass="ui-button-success" style="margin-top: 15px;" />
+        </h:form>
+
+    </div>
+
+    <div class="form-section">
+        <h3>All Accounts</h3>
+        <h:form id="accountsTable">
+            <p:dataTable value="#{accountBean.accounts}" var="account"
+                         paginator="true" rows="8"
+                         styleClass="p-datatable-striped p-datatable-gridlines"
+                         responsiveLayout="scroll" emptyMessage="No accounts found">
+                <p:column headerText="Account Number" style="width: 150px;">
+                    <h:outputText value="#{account.accountNumber}" style="font-weight: bold; color: #2980b9;" />
+                </p:column>
+                <p:column headerText="Account Holder">
+                    <h:outputText value="#{account.customer.name}" />
+                </p:column>
+                <p:column headerText="Balance" style="width: 120px;">
+                    <h:outputText value="#{account.balance}" style="font-weight: bold; color: #27ae60;">
+                        <f:convertNumber type="currency" currencySymbol="$" groupingUsed="true"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="National ID">
+                    <h:outputText value="#{account.customer.nationalId}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </div>
+</h:body>
+</html>

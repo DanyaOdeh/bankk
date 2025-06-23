@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Bank Management System</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+        .header-card h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin: 0 0 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .header-card .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin: 0;
+        }
+        .menu-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+        }
+        .ui-menu {
+            border: none !important;
+            background: transparent !important;
+        }
+        .ui-menu .ui-menuitem-link {
+            padding: 15px 20px !important;
+            border-radius: 10px !important;
+            margin: 5px 0 !important;
+            transition: all 0.3s ease !important;
+            font-size: 16px !important;
+        }
+        .ui-menu .ui-menuitem-link:hover {
+            background: linear-gradient(45deg, #3498db, #2980b9) !important;
+            color: white !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3) !important;
+        }
+        .dialog-header {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+        }
+        .form-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .form-section h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .ui-button {
+            border-radius: 8px !important;
+            padding: 10px 20px !important;
+            font-weight: bold !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .ui-button:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+        }
+        .ui-datatable {
+            border-radius: 10px !important;
+            overflow: hidden !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+        }
+        .search-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e8f4f8;
+            border-radius: 10px;
+        }
+
+    </style>
+</h:head>
+
+<h:body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header-card">
+            <h1>🏦 Bank Management System</h1>
+            <p class="subtitle">Complete Banking Solutions at Your Fingertips</p>
+        </div>
+
+        <!-- Main Menu -->
+        <div class="menu-card">
+            <h:form>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <p:commandButton value="👥 Customer Management"
+                                     action="customer-auth.xhtml?faces-redirect=true"
+                                     styleClass="ui-button-lg ui-button-info"
+                                     style="height: 60px; font-size: 16px;" />
+
+                    <p:commandButton value="💳 Account Management"
+                                     action="account-auth.xhtml?faces-redirect=true"
+                                     styleClass="ui-button-lg ui-button-success"
+                                     style="height: 60px; font-size: 16px;" />
+
+                    <p:commandButton value="💰 Banking Operations"
+                                     onclick="PF('operationsDialog').show(); return false;"
+                                     styleClass="ui-button-lg ui-button-warning"
+                                     style="height: 60px; font-size: 16px;" />
+
+                    <p:commandButton value="🔄 Money Transfer"
+                                     onclick="PF('transferDialog').show(); return false;"
+                                     styleClass="ui-button-lg ui-button-secondary"
+                                     style="height: 60px; font-size: 16px;" />
+                </div>
+
+
+
+            </h:form>
+        </div>
+    </div>
+
+
+
+    <!-- Account Management Dialog -->
+    <p:dialog header="💳 Account Management" widgetVar="accountsDialog" modal="true"
+              width="90%" height="85%" responsive="true" draggable="true" resizable="true">
+
+        <div class="form-section">
+            <h3>Create New Account</h3>
+            <h:form id="accountForm">
+                <p:growl id="accountMessages" showDetail="true" autoUpdate="true" />
+                <p:panel>
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <h:outputLabel for="accountCustomer" value="Select Customer:"/>
+                        <p:selectOneMenu id="accountCustomer" value="#{accountBean.account.customer.id}"
+                                         converter="jakarta.faces.Integer" required="true" style="width: 300px;">
+                            <f:selectItem itemLabel="-- Select Customer --" itemValue="" />
+                            <f:selectItems value="#{accountBean.customers}" var="cust"
+                                           itemLabel="#{cust.name} (ID: #{cust.nationalId})"
+                                           itemValue="#{cust.id}" />
+                        </p:selectOneMenu>
+
+                        <h:outputLabel for="initialBalance" value="Initial Balance:"/>
+                        <p:inputText id="initialBalance" value="#{accountBean.account.balance}"
+                                     placeholder="0.00" required="true" style="width: 300px;">
+                            <f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2"/>
+                        </p:inputText>
+                    </h:panelGrid>
+                </p:panel>
+
+                <p:commandButton value="Create Account" icon="pi pi-plus-circle"
+                                 action="#{accountBean.createAccount}"
+                                 update="accountForm accountsTable"
+                                 styleClass="ui-button-success" style="margin-top: 15px;" />
+            </h:form>
+        </div>
+
+        <div class="form-section">
+            <h3>All Accounts</h3>
+            <h:form id="accountsTable">
+                <p:dataTable value="#{accountBean.accounts}" var="account"
+                             paginator="true" rows="8"
+                             styleClass="p-datatable-striped p-datatable-gridlines"
+                             responsiveLayout="scroll" emptyMessage="No accounts found">
+                    <p:column headerText="Account Number" style="width: 150px;">
+                        <h:outputText value="#{account.accountNumber}" style="font-weight: bold; color: #2980b9;" />
+                    </p:column>
+                    <p:column headerText="Account Holder">
+                        <h:outputText value="#{account.customer.name}" />
+                    </p:column>
+                    <p:column headerText="Balance" style="width: 120px;">
+                        <h:outputText value="#{account.balance}" style="font-weight: bold; color: #27ae60;">
+                            <f:convertNumber type="currency" currencySymbol="$" groupingUsed="true"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="National ID">
+                        <h:outputText value="#{account.customer.nationalId}" />
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </div>
+    </p:dialog>
+
+    <!-- Banking Operations Dialog -->
+    <p:dialog header="💰 Banking Operations" widgetVar="operationsDialog" modal="true"
+              width="80%" responsive="true" draggable="true" resizable="true">
+
+        <h:form id="operationsForm">
+            <p:growl id="operationMessages" showDetail="true" autoUpdate="true" />
+
+            <div class="form-section">
+                <h3>Deposit / Withdraw Money</h3>
+                <p:panel>
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <h:outputLabel for="opAccountNumber" value="Account Number:"/>
+                        <p:inputText id="opAccountNumber" value="#{accountBean.operationAccountNumber}"
+                                     placeholder="Enter account number" required="true" style="width: 300px;" />
+
+                        <h:outputLabel for="opAmount" value="Amount:"/>
+                        <p:inputText id="opAmount" value="#{accountBean.operationAmount}"
+                                     placeholder="0.00" required="true" style="width: 300px;">
+                            <f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2"/>
+                        </p:inputText>
+                    </h:panelGrid>
+                </p:panel>
+
+                <div style="margin-top: 20px;">
+                    <p:commandButton value="💵 Deposit" action="#{accountBean.deposit}"
+                                     update="operationsForm accountsTable" icon="pi pi-plus"
+                                     styleClass="ui-button-success" style="margin-right: 10px;" />
+                    <p:commandButton value="💸 Withdraw" action="#{accountBean.withdraw}"
+                                     update="operationsForm accountsTable" icon="pi pi-minus"
+                                     styleClass="ui-button-warning" />
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <!-- Money Transfer Dialog -->
+    <p:dialog header="🔄 Money Transfer" widgetVar="transferDialog" modal="true"
+              width="80%" responsive="true" draggable="true" resizable="true">
+
+        <h:form id="transferForm">
+            <p:growl id="transferMessages" showDetail="true" autoUpdate="true" />
+
+            <div class="form-section">
+                <h3>Transfer Funds Between Accounts</h3>
+                <p:panel>
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <h:outputLabel for="senderAccount" value="From Account:"/>
+                        <p:selectOneMenu id="senderAccount" value="#{accountBean.senderAccountId}" required="true" style="width: 400px;">
+                            <f:selectItem itemLabel="-- Select Sender Account --" itemValue="" />
+                            <f:selectItems value="#{accountBean.accounts}" var="acc"
+                                           itemLabel="#{acc.accountNumber} - #{acc.customer.name} (Balance: $#{acc.balance})"
+                                           itemValue="#{acc.id}" />
+                        </p:selectOneMenu>
+
+                        <h:outputLabel for="receiverAccount" value="To Account:"/>
+                        <p:selectOneMenu id="receiverAccount" value="#{accountBean.receiverAccountId}" required="true" style="width: 400px;">
+                            <f:selectItem itemLabel="-- Select Receiver Account --" itemValue="" />
+                            <f:selectItems value="#{accountBean.accounts}" var="acc"
+                                           itemLabel="#{acc.accountNumber} - #{acc.customer.name}"
+                                           itemValue="#{acc.id}" />
+                        </p:selectOneMenu>
+
+                        <h:outputLabel for="transferAmount" value="Transfer Amount:"/>
+
+                       <p:inputText id="transferAmount" value="#{accountBean.transferAmount}"
+                                     placeholder="0.00" required="true" style="width: 300px;">
+                            <f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2"/>
+                        </p:inputText>
+
+
+                    </h:panelGrid>
+                </p:panel>
+
+                <p:commandButton value="🔄 Transfer Money" action="#{accountBean.transfer}"
+                                 update="transferForm accountsTable" icon="pi pi-send"
+                                 styleClass="ui-button-info" style="margin-top: 20px;" />
+            </div>
+        </h:form>
+    </p:dialog>
+
+</h:body>
+</html>
